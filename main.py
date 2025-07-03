@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import matplotlib.pyplot as plt
 from grid_env import GridEnv
 import search_algorithms as sa

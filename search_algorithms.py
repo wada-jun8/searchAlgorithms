@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 import heapq
 from collections import deque
 from typing import List, Tuple, Optional
