@@ -1,10 +1,10 @@
 #! /usr/bin/env python3
 
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 class GridEnv:
-    def __init__(self, width: int, height: int, obstacle_ratio: float = 0.2, seed: int = 42):
+    def __init__(self, width: int, height: int, obstacle_ratio: float = 0.2, seed: Optional[int] = None):
         self.width = width
         self.height = height
         self.obstacle_ratio = obstacle_ratio
@@ -14,7 +14,8 @@ class GridEnv:
         self.goal = (height - 1, width - 1)
 
     def _generate_grid(self) -> List[List[int]]:
-        random.seed(self.seed)
+        if self.seed is not None:
+            random.seed(self.seed)
         grid = [[0 for _ in range(self.width)] for _ in range(self.height)]
         num_obstacles = int(self.width * self.height * self.obstacle_ratio)
         obstacles = set()

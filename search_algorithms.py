@@ -3,6 +3,7 @@
 import heapq
 from collections import deque
 from typing import List, Tuple, Optional
+import time
 
 def heuristic(a: Tuple[int, int], b: Tuple[int, int]) -> float:
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
@@ -25,14 +26,27 @@ def reconstruct_path(came_from, current):
     return path[::-1]
 
 def astar(grid, start, goal):
+    t0 = time.time()
     open_list = []
     heapq.heappush(open_list, (0 + heuristic(start, goal), 0, start))
     came_from = {}
     cost_so_far = {start: 0}
+    visited_nodes = set()
+    loop_count = 0
     while open_list:
         _, g, current = heapq.heappop(open_list)
+        loop_count += 1
+        visited_nodes.add(current)
         if current == goal:
-            return reconstruct_path(came_from, current)
+            t1 = time.time()
+            path = reconstruct_path(came_from, current)
+            return path, {
+                'loop_count': loop_count,
+                'visited_nodes': len(visited_nodes),
+                'path_length': len(path) if path else 0,
+                'time': t1-t0,
+                'visited_set': visited_nodes
+            }
         for neighbor in get_neighbors(grid, current):
             new_cost = g + 1
             if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
@@ -40,67 +54,118 @@ def astar(grid, start, goal):
                 priority = new_cost + heuristic(neighbor, goal)
                 heapq.heappush(open_list, (priority, new_cost, neighbor))
                 came_from[neighbor] = current
-    return None
+    t1 = time.time()
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes}
 
 def dijkstra(grid, start, goal):
+    t0 = time.time()
     open_list = []
     heapq.heappush(open_list, (0, start))
     came_from = {}
     cost_so_far = {start: 0}
+    visited_nodes = set()
+    loop_count = 0
     while open_list:
         g, current = heapq.heappop(open_list)
+        loop_count += 1
+        visited_nodes.add(current)
         if current == goal:
-            return reconstruct_path(came_from, current)
+            t1 = time.time()
+            path = reconstruct_path(came_from, current)
+            return path, {
+                'loop_count': loop_count,
+                'visited_nodes': len(visited_nodes),
+                'path_length': len(path) if path else 0,
+                'time': t1-t0,
+                'visited_set': visited_nodes
+            }
         for neighbor in get_neighbors(grid, current):
             new_cost = g + 1
             if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
                 cost_so_far[neighbor] = new_cost
                 heapq.heappush(open_list, (new_cost, neighbor))
                 came_from[neighbor] = current
-    return None
+    t1 = time.time()
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes}
 
 def bfs(grid, start, goal):
+    t0 = time.time()
     queue = deque([start])
     came_from = {}
     visited = set([start])
+    loop_count = 0
     while queue:
         current = queue.popleft()
+        loop_count += 1
         if current == goal:
-            return reconstruct_path(came_from, current)
+            t1 = time.time()
+            path = reconstruct_path(came_from, current)
+            return path, {
+                'loop_count': loop_count,
+                'visited_nodes': len(visited),
+                'path_length': len(path) if path else 0,
+                'time': t1-t0,
+                'visited_set': visited
+            }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
                 visited.add(neighbor)
                 queue.append(neighbor)
                 came_from[neighbor] = current
-    return None
+    t1 = time.time()
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited}
 
 def dfs(grid, start, goal):
+    t0 = time.time()
     stack = [start]
     came_from = {}
     visited = set([start])
+    loop_count = 0
     while stack:
         current = stack.pop()
+        loop_count += 1
         if current == goal:
-            return reconstruct_path(came_from, current)
+            t1 = time.time()
+            path = reconstruct_path(came_from, current)
+            return path, {
+                'loop_count': loop_count,
+                'visited_nodes': len(visited),
+                'path_length': len(path) if path else 0,
+                'time': t1-t0,
+                'visited_set': visited
+            }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
                 visited.add(neighbor)
                 stack.append(neighbor)
                 came_from[neighbor] = current
-    return None
+    t1 = time.time()
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited}
 
 def greedy(grid, start, goal):
+    t0 = time.time()
     open_list = []
     heapq.heappush(open_list, (heuristic(start, goal), start))
     came_from = {}
     visited = set([start])
+    loop_count = 0
     while open_list:
         _, current = heapq.heappop(open_list)
+        loop_count += 1
         if current == goal:
-            return reconstruct_path(came_from, current)
+            t1 = time.time()
+            path = reconstruct_path(came_from, current)
+            return path, {
+                'loop_count': loop_count,
+                'visited_nodes': len(visited),
+                'path_length': len(path) if path else 0,
+                'time': t1-t0,
+                'visited_set': visited
+            }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
                 visited.add(neighbor)
                 heapq.heappush(open_list, (heuristic(neighbor, goal), neighbor))
                 came_from[neighbor] = current
-    return None 
+    t1 = time.time()
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited} 
