@@ -1,0 +1,2 @@
+algorithm,goal_reached,path_length,nodes,loops,time
+DFS,1,29,56,30,4.935264587402344e-05

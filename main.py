@@ -6,6 +6,7 @@ from grid_env import GridEnv
 import search_algorithms as sa
 import numpy as np
 from matplotlib.colors import ListedColormap
+import csv
 
 ALGOS = [
     ("A*", sa.astar),
@@ -42,7 +43,6 @@ def plot_grid_single(grid, path, start, goal, algo_name, color, info, visited_se
 
 def main():
     env = GridEnv(width=15, height=15, obstacle_ratio=0.2, seed=None)  # seed=Noneで毎回ランダム
-    print(f'seed: {env.seed}')
     grid = env.get_grid()
     start, goal = env.get_start_goal()
     # 障害物の数を計算して表示
@@ -51,7 +51,14 @@ def main():
     for idx, ((name, algo), color) in enumerate(zip(ALGOS, COLORS)):
         path, info = algo(grid, start, goal)
         visited_set = info.get('visited_set', set())
-        print(f'{name}: path length={info["path_length"]}, nodes={info["visited_nodes"]}, loops={info["loop_count"]}, time={info["time"]:.5f}s')
+        goal_reached = 1 if path is not None else 0
+        print(f'{name}: goal_reached={goal_reached}, path length={info["path_length"]}, nodes={info["visited_nodes"]}, loops={info["loop_count"]}, time={info["time"]:.5f}s')
+        if goal_reached == 1:
+            filename = f'result_{name.replace("*", "star")}.csv'
+            with open(filename, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(["algorithm", "goal_reached", "path_length", "nodes", "loops", "time"])
+                writer.writerow([name, goal_reached, info["path_length"], info["visited_nodes"], info["loop_count"], info["time"]])
         plot_grid_single(grid, path, start, goal, name, color, info, visited_set)
     plt.show()
 
