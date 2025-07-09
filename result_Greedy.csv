@@ -1,2 +1,2 @@
 algorithm,goal_reached,path_length,nodes,loops,time
-Greedy,1,29,56,30,0.00011420249938964844
+Greedy,1,33,83,53,0.0001595020294189453

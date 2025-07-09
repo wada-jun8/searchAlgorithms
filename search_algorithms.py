@@ -32,11 +32,13 @@ def astar(grid, start, goal):
     came_from = {}
     cost_so_far = {start: 0}
     visited_nodes = set()
+    calc_nodes = []
     loop_count = 0
     while open_list:
         _, g, current = heapq.heappop(open_list)
         loop_count += 1
         visited_nodes.add(current)
+        calc_nodes.append(current)
         if current == goal:
             t1 = time.time()
             path = reconstruct_path(came_from, current)
@@ -45,7 +47,8 @@ def astar(grid, start, goal):
                 'visited_nodes': len(visited_nodes),
                 'path_length': len(path) if path else 0,
                 'time': t1-t0,
-                'visited_set': visited_nodes
+                'visited_set': visited_nodes,
+                'calc_nodes': calc_nodes
             }
         for neighbor in get_neighbors(grid, current):
             new_cost = g + 1
@@ -55,7 +58,7 @@ def astar(grid, start, goal):
                 heapq.heappush(open_list, (priority, new_cost, neighbor))
                 came_from[neighbor] = current
     t1 = time.time()
-    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes}
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes, 'calc_nodes': calc_nodes}
 
 def dijkstra(grid, start, goal):
     t0 = time.time()
@@ -64,11 +67,13 @@ def dijkstra(grid, start, goal):
     came_from = {}
     cost_so_far = {start: 0}
     visited_nodes = set()
+    calc_nodes = []
     loop_count = 0
     while open_list:
         g, current = heapq.heappop(open_list)
         loop_count += 1
         visited_nodes.add(current)
+        calc_nodes.append(current)
         if current == goal:
             t1 = time.time()
             path = reconstruct_path(came_from, current)
@@ -77,7 +82,8 @@ def dijkstra(grid, start, goal):
                 'visited_nodes': len(visited_nodes),
                 'path_length': len(path) if path else 0,
                 'time': t1-t0,
-                'visited_set': visited_nodes
+                'visited_set': visited_nodes,
+                'calc_nodes': calc_nodes
             }
         for neighbor in get_neighbors(grid, current):
             new_cost = g + 1
@@ -86,17 +92,19 @@ def dijkstra(grid, start, goal):
                 heapq.heappush(open_list, (new_cost, neighbor))
                 came_from[neighbor] = current
     t1 = time.time()
-    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes}
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited_nodes), 'path_length': 0, 'time': t1-t0, 'visited_set': visited_nodes, 'calc_nodes': calc_nodes}
 
 def bfs(grid, start, goal):
     t0 = time.time()
     queue = deque([start])
     came_from = {}
     visited = set([start])
+    calc_nodes = []
     loop_count = 0
     while queue:
         current = queue.popleft()
         loop_count += 1
+        calc_nodes.append(current)
         if current == goal:
             t1 = time.time()
             path = reconstruct_path(came_from, current)
@@ -105,7 +113,8 @@ def bfs(grid, start, goal):
                 'visited_nodes': len(visited),
                 'path_length': len(path) if path else 0,
                 'time': t1-t0,
-                'visited_set': visited
+                'visited_set': visited,
+                'calc_nodes': calc_nodes
             }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
@@ -113,17 +122,19 @@ def bfs(grid, start, goal):
                 queue.append(neighbor)
                 came_from[neighbor] = current
     t1 = time.time()
-    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited}
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited, 'calc_nodes': calc_nodes}
 
 def dfs(grid, start, goal):
     t0 = time.time()
     stack = [start]
     came_from = {}
     visited = set([start])
+    calc_nodes = []
     loop_count = 0
     while stack:
         current = stack.pop()
         loop_count += 1
+        calc_nodes.append(current)
         if current == goal:
             t1 = time.time()
             path = reconstruct_path(came_from, current)
@@ -132,7 +143,8 @@ def dfs(grid, start, goal):
                 'visited_nodes': len(visited),
                 'path_length': len(path) if path else 0,
                 'time': t1-t0,
-                'visited_set': visited
+                'visited_set': visited,
+                'calc_nodes': calc_nodes
             }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
@@ -140,7 +152,7 @@ def dfs(grid, start, goal):
                 stack.append(neighbor)
                 came_from[neighbor] = current
     t1 = time.time()
-    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited}
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited, 'calc_nodes': calc_nodes}
 
 def greedy(grid, start, goal):
     t0 = time.time()
@@ -148,10 +160,12 @@ def greedy(grid, start, goal):
     heapq.heappush(open_list, (heuristic(start, goal), start))
     came_from = {}
     visited = set([start])
+    calc_nodes = []
     loop_count = 0
     while open_list:
         _, current = heapq.heappop(open_list)
         loop_count += 1
+        calc_nodes.append(current)
         if current == goal:
             t1 = time.time()
             path = reconstruct_path(came_from, current)
@@ -160,7 +174,8 @@ def greedy(grid, start, goal):
                 'visited_nodes': len(visited),
                 'path_length': len(path) if path else 0,
                 'time': t1-t0,
-                'visited_set': visited
+                'visited_set': visited,
+                'calc_nodes': calc_nodes
             }
         for neighbor in get_neighbors(grid, current):
             if neighbor not in visited:
@@ -168,4 +183,4 @@ def greedy(grid, start, goal):
                 heapq.heappush(open_list, (heuristic(neighbor, goal), neighbor))
                 came_from[neighbor] = current
     t1 = time.time()
-    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited} 
+    return None, {'loop_count': loop_count, 'visited_nodes': len(visited), 'path_length': 0, 'time': t1-t0, 'visited_set': visited, 'calc_nodes': calc_nodes} 

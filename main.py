@@ -19,7 +19,7 @@ COLORS = ['red', 'blue', 'green', 'purple', 'orange']
 NODE_COLORS = ['#ffcccc', '#ccccff', '#ccffcc', '#e0ccff', '#ffe0b3']  # 薄い色
 
 
-def plot_grid_single(grid, path, start, goal, algo_name, color, info, visited_set):
+def plot_grid_single(grid, path, start, goal, algo_name, color, info, calc_nodes):
     grid_disp = np.array([[1 if cell == 1 else 0 for cell in row] for row in grid])
     plt.figure()
     # カスタムカラーマップで障害物を黒に
@@ -27,8 +27,8 @@ def plot_grid_single(grid, path, start, goal, algo_name, color, info, visited_se
     plt.imshow(grid_disp, cmap=cmap, origin='upper')
     ax = plt.gca()
     # 計算したノードを薄い色で塗る（障害物以外）
-    if visited_set:
-        for (vx, vy) in visited_set:
+    if calc_nodes:
+        for (vx, vy) in calc_nodes:
             if grid[vx][vy] == 0:
                 ax.add_patch(Rectangle((vy-0.5, vx-0.5), 1, 1, color=color, alpha=0.2, zorder=1))
     # 経路
@@ -50,8 +50,8 @@ def main():
     print(f'障害物の数: {num_obstacles}')
     for idx, ((name, algo), color) in enumerate(zip(ALGOS, COLORS)):
         path, info = algo(grid, start, goal)
-        visited_set = info.get('visited_set', set())
-        goal_reached = 1 if path is not None else 0
+        calc_nodes = info.get('calc_nodes', [])
+        goal_reached = 1 if path is not None and len(path) > 0 else 0
         print(f'{name}: goal_reached={goal_reached}, path length={info["path_length"]}, nodes={info["visited_nodes"]}, loops={info["loop_count"]}, time={info["time"]:.5f}s')
         if goal_reached == 1:
             filename = f'result_{name.replace("*", "star")}.csv'
@@ -59,7 +59,7 @@ def main():
                 writer = csv.writer(f)
                 writer.writerow(["algorithm", "goal_reached", "path_length", "nodes", "loops", "time"])
                 writer.writerow([name, goal_reached, info["path_length"], info["visited_nodes"], info["loop_count"], info["time"]])
-        plot_grid_single(grid, path, start, goal, name, color, info, visited_set)
+        plot_grid_single(grid, path, start, goal, name, color, info, calc_nodes)
     plt.show()
 
 if __name__ == '__main__':
